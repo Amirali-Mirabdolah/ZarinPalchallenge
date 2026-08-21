@@ -1,0 +1,8 @@
+# Challenge dataset
+data/*.csv
+data/*.sqlite
+data/*.sqlite3
+
+# Next.js
+analytics-dashboard/node_modules/
+analytics-dashboard/.next/
