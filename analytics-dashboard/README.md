@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This project is the local scaffold for the ZarinPal merchant-operations analytics MVP.
 
-## Getting Started
+## Data layer
 
-First, run the development server:
+- Source dataset: `../data/challenge_data.sqlite`
+- Default DB path: resolved from `process.cwd()` to the repository root `data/challenge_data.sqlite`
+- Override with `DATABASE_PATH` if the dataset is stored elsewhere for local analysis
+
+The data layer is intentionally kept separate from UI code. The app reads from SQLite via `src/data/db.ts`, and the aggregate logic is defined in the corresponding data/metric modules.
+
+### Grain rules
+
+- Session-level metrics are the business source of truth.
+- Attempt-level metrics are operational detail only.
+- `amount` must not be double-counted across repeated attempts in the same session.
+- `session_status` and `try_status` are distinct semantics and remain separate.
+
+### ETL / aggregate rebuild
+
+From the app directory:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+python scripts/build_aggregates.py --source ../data/challenge_data.sqlite --output ../data/aggregates.sqlite
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This rebuilds the local aggregate SQLite file deterministically from the raw `payments` dataset without modifying the source data file.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+python scripts/validate_merchant_metrics.py --db ../data/challenge_data.sqlite
+python scripts/test_merchant_metrics.py
+```
 
-## Learn More
+This checks the merchant-level fail-rate bounds, session-grain failed value logic, retry counts, and top-10 failed-value concentration against the validated OpenSpec anchors.
 
-To learn more about Next.js, take a look at the following resources:
+## Development notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This scaffold is a foundation layer only. Product UI/API implementation remains out of scope for this phase.

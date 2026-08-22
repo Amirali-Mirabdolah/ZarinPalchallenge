@@ -14,7 +14,7 @@ export default function Home() {
           <Badge variant="secondary">Scaffold ready</Badge>
           <h1 className="text-3xl font-bold tracking-tight">ZarinPal Merchant Ops Dashboard</h1>
           <p className="text-sm text-slate-600">
-            SQLite source: {getDatabasePath()}
+            SQLite source: data/challenge_data.sqlite
           </p>
         </header>
 
