@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const DEFAULT_DB_FILENAME = "challenge_data.sqlite";
-let db: Database.Database | null = null;
+let db: Database | null = null;
 
 export function getDatabasePath() {
   const configuredPath = process.env.DATABASE_PATH?.trim();

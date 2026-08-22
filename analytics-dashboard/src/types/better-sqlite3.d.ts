@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- the native module API is inherently dynamic */
 declare module 'better-sqlite3' {
   interface Options {
     readonly?: boolean;
